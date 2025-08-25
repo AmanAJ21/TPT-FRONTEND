@@ -1179,7 +1179,7 @@ export default function DashboardPage() {
                 <CardDescription>Your payment details</CardDescription>
               </CardHeader>
               <CardContent>
-                {user.bank && user.bank.bankName ? (
+                {user?.bank && user.bank.bankName ? (
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                       <div>

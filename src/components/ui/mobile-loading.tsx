@@ -3,7 +3,7 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 import { Card, CardContent } from "@/components/ui/card"
-import { Skeleton } from "@/components/ui/skeleton"
+
 
 interface MobileLoadingProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: 'spinner' | 'skeleton' | 'pulse' | 'dots'

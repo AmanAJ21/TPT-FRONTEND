@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -11,7 +11,7 @@ import Header from '@/components/comp-577'
 import Footer from "@/components/footer"
 import { apiClient } from "@/lib/api"
 
-export default function ResetPasswordConfirmPage() {
+function ResetPasswordConfirmForm() {
     const [password, setPassword] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
     const [showPassword, setShowPassword] = useState(false)
@@ -369,4 +369,12 @@ export default function ResetPasswordConfirmPage() {
             <Footer />
         </>
     )
+}
+
+export default function ResetPasswordConfirmPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ResetPasswordConfirmForm />
+    </Suspense>
+  )
 }

@@ -29,7 +29,7 @@ interface SearchResult {
   href?: string
 }
 
-interface MobileSearchProps extends React.HTMLAttributes<HTMLDivElement> {
+interface MobileSearchProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'results'> {
   placeholder?: string
   value?: string
   onValueChange?: (value: string) => void
@@ -364,11 +364,11 @@ const MobileSearch = React.forwardRef<HTMLDivElement, MobileSearchProps>(
 MobileSearch.displayName = "MobileSearch"
 
 // Compact search bar for headers
-interface CompactSearchProps extends Omit<MobileSearchProps, 'results' | 'isLoading'> {
+interface CompactSearchProps extends Omit<MobileSearchProps, 'results' | 'isLoading' | 'onSubmit'> {
   onSubmit?: (query: string) => void
 }
 
-const CompactSearch = React.forwardRef<HTMLDivElement, CompactSearchProps>(
+const CompactSearch = React.forwardRef<HTMLFormElement, CompactSearchProps>(
   ({ className, placeholder = "Search...", onSubmit, ...props }, ref) => {
     const [value, setValue] = React.useState("")
 

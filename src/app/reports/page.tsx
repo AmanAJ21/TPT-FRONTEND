@@ -42,7 +42,8 @@ import {
   X,
   CheckCircle,
   AlertCircle,
-  Info
+  Info,
+  Download
 } from "lucide-react"
 import { TransportBill, BillStatus } from "@/lib/transport-types"
 import { apiClient } from "@/lib/api"
@@ -207,7 +208,7 @@ export default function ReportsPage() {
         entry.vehicleNo.toLowerCase().includes(query) ||
         entry.from.toLowerCase().includes(query) ||
         entry.to.toLowerCase().includes(query) ||
-        entry.transportBillData.invoiceNumber?.toLowerCase().includes(query) ||
+        entry.transportBillData.invoiceNo?.toLowerCase().includes(query) ||
         entry.ownerData.ownerNameAndAddress.toLowerCase().includes(query) ||
         (entry.id || entry._id || '').toLowerCase().includes(query)
       )

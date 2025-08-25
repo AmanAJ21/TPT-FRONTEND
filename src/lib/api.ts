@@ -297,6 +297,7 @@ class ApiClient {
     status?: string;
     from?: string;
     to?: string;
+    financialYear?: string;
   }): Promise<ApiResponse<{ entries: any[]; total: number; page: number; pages: number }>> {
     const queryParams = new URLSearchParams();
     if (params) {
