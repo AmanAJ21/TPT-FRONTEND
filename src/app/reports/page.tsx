@@ -189,6 +189,11 @@ export default function ReportsPage() {
     }
 
     const entryId = entry.id || entry._id
+    if (!entryId) {
+      alert('Error: Entry ID not found')
+      return
+    }
+    
     setDeletingId(entryId)
 
     try {
