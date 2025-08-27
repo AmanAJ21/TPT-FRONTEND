@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
+import { useRouter } from "next/navigation"
 import Layout from "@/components/layout"
 import { PageHeader, PageHeaderActions, PageHeaderPrimaryAction, PageHeaderSecondaryActions } from "@/components/ui/page-header"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -166,6 +167,50 @@ export default function ReportsPage() {
   const [showFilters, setShowFilters] = useState(false)
   const [selectedEntries, setSelectedEntries] = useState<string[]>([])
   const [viewMode, setViewMode] = useState<'table' | 'cards'>('table')
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+
+  // Router for navigation
+  const router = useRouter()
+
+  // Action handlers
+  const handleView = (entry: TransportBill) => {
+    // Navigate to entry page with view mode and entry ID
+    router.push(`/entry?mode=view&id=${entry.id || entry._id}`)
+  }
+
+  const handleEdit = (entry: TransportBill) => {
+    // Navigate to entry page with edit mode and entry ID
+    router.push(`/entry?mode=edit&id=${entry.id || entry._id}`)
+  }
+
+  const handleDelete = async (entry: TransportBill) => {
+    if (!confirm('Are you sure you want to delete this entry? This action cannot be undone.')) {
+      return
+    }
+
+    const entryId = entry.id || entry._id
+    setDeletingId(entryId)
+
+    try {
+      const response = await apiClient.deleteTransportEntry(entryId)
+      
+      if (response.success) {
+        // Remove the entry from the local state
+        setEntries(prev => prev.filter(e => (e.id || e._id) !== entryId))
+        setFilteredEntries(prev => prev.filter(e => (e.id || e._id) !== entryId))
+        
+        // Show success message (you could use a toast notification here)
+        alert('Entry deleted successfully!')
+      } else {
+        alert('Failed to delete entry: ' + (response.error || 'Unknown error'))
+      }
+    } catch (error) {
+      console.error('Error deleting entry:', error)
+      alert('Failed to delete entry. Please try again.')
+    } finally {
+      setDeletingId(null)
+    }
+  }
 
   // Load entries from API
   const loadEntries = async () => {
@@ -385,14 +430,37 @@ export default function ReportsPage() {
       label: 'Actions',
       render: (value: any, row: TransportBill) => (
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="h-8 w-8 p-0"
+            onClick={() => handleView(row)}
+            title="View Entry"
+          >
             <Eye className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="h-8 w-8 p-0"
+            onClick={() => handleEdit(row)}
+            title="Edit Entry"
+          >
             <Edit className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-destructive">
-            <Trash2 className="h-4 w-4" />
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="h-8 w-8 p-0 text-destructive"
+            onClick={() => handleDelete(row)}
+            disabled={deletingId === (row.id || row._id)}
+            title="Delete Entry"
+          >
+            {deletingId === (row.id || row._id) ? (
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+            ) : (
+              <Trash2 className="h-4 w-4" />
+            )}
           </Button>
         </div>
       )
