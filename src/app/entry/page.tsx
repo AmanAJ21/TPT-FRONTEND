@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
+import { useSearchParams, useRouter } from "next/navigation"
 import Layout from "@/components/layout"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -111,10 +112,16 @@ const convertApiResponseToTransportBill = (apiData: any): TransportBill => {
   }
 }
 
-export default function TransportEntriesPage() {
+function TransportEntriesPageContent() {
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const mode = searchParams.get('mode') // 'view' or 'edit'
+  const entryId = searchParams.get('id')
   const [entries, setEntries] = useState<TransportBill[]>([])
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingEntry, setEditingEntry] = useState<TransportBill | null>(null)
+  const [selectedEntry, setSelectedEntry] = useState<TransportBill | null>(null)
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [isLoadingList, setIsLoadingList] = useState(true)
@@ -209,7 +216,36 @@ export default function TransportEntriesPage() {
         deliveryDate: today
       }
     }))
-  }, [])  // Reset form data
+  }, [])
+
+  // Handle URL-based view/edit modes
+  useEffect(() => {
+    if (mode && entryId) {
+      // Find the entry by ID
+      const entry = entries.find(e => (e.id || e._id) === entryId)
+      if (entry) {
+        setSelectedEntry(entry)
+        if (mode === 'view') {
+          setIsViewDialogOpen(true)
+        } else if (mode === 'edit') {
+          handleEdit(entry)
+        }
+      } else if (entries.length > 0) {
+        // Entry not found, redirect back to reports
+        router.push('/reports')
+      }
+    }
+  }, [mode, entryId, entries, router])
+
+  // Handle dialog close - clear URL parameters
+  const handleDialogClose = () => {
+    setIsDialogOpen(false)
+    setIsViewDialogOpen(false)
+    setSelectedEntry(null)
+    resetForm()
+    // Clear URL parameters
+    router.push('/entry')
+  }  // Reset form data
   const resetForm = () => {
     const today = mounted ? new Date().toISOString().split('T')[0] : getTodayString()
     setFormData({
@@ -447,7 +483,10 @@ export default function TransportEntriesPage() {
               Manage transport entries with owner and transport details
             </p>
           </div>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <Dialog open={isDialogOpen} onOpenChange={(open) => {
+            if (!open) handleDialogClose()
+            else setIsDialogOpen(true)
+          }}>
             <DialogTrigger asChild>
               <Button onClick={() => resetForm()} className="w-full sm:w-auto">
                 <Plus className="h-4 w-4 mr-2" />
@@ -1210,6 +1249,151 @@ export default function TransportEntriesPage() {
               </form>
             </DialogContent>
           </Dialog>
+
+          {/* View Dialog */}
+          <Dialog open={isViewDialogOpen} onOpenChange={(open) => {
+            if (!open) handleDialogClose()
+            else setIsViewDialogOpen(true)
+          }}>
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full">
+              <DialogHeader>
+                <DialogTitle>View Transport Entry</DialogTitle>
+                <DialogDescription>
+                  Transport entry details (Read-only)
+                </DialogDescription>
+              </DialogHeader>
+
+              {selectedEntry && (
+                <div className="space-y-6">
+                  {/* Basic Information */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">Basic Information</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium mb-2">Entry ID</label>
+                          <div className="p-2 bg-muted rounded">{selectedEntry.id || selectedEntry._id}</div>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-2">Date</label>
+                          <div className="p-2 bg-muted rounded">{formatDate(selectedEntry.date)}</div>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium mb-2">Vehicle No</label>
+                          <div className="p-2 bg-muted rounded">{selectedEntry.vehicleNo}</div>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-2">Route</label>
+                          <div className="p-2 bg-muted rounded">{selectedEntry.from} → {selectedEntry.to}</div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Transport Details */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">Transport Details</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium mb-2">Bill No</label>
+                          <div className="p-2 bg-muted rounded">{selectedEntry.transportBillData.bill}</div>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-2">Invoice No</label>
+                          <div className="p-2 bg-muted rounded">{selectedEntry.transportBillData.invoiceNo}</div>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-2">Status</label>
+                          <div className="p-2">
+                            <Badge
+                              variant={
+                                selectedEntry.transportBillData.status === BillStatus.COMPLETED
+                                  ? "default"
+                                  : selectedEntry.transportBillData.status === BillStatus.IN_PROGRESS
+                                    ? "secondary"
+                                    : selectedEntry.transportBillData.status === BillStatus.CANCELLED
+                                      ? "destructive"
+                                      : "outline"
+                              }
+                            >
+                              {selectedEntry.transportBillData.status}
+                            </Badge>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium mb-2">Handle Charges</label>
+                          <div className="p-2 bg-muted rounded">₹{selectedEntry.transportBillData.handleCharges.toLocaleString()}</div>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-2">Detention</label>
+                          <div className="p-2 bg-muted rounded">₹{selectedEntry.transportBillData.detention.toLocaleString()}</div>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-2">Freight</label>
+                          <div className="p-2 bg-muted rounded">₹{selectedEntry.transportBillData.freight.toLocaleString()}</div>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-2">Total</label>
+                          <div className="p-2 bg-muted rounded font-semibold">₹{selectedEntry.transportBillData.total.toLocaleString()}</div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Owner Details */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">Owner Details</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium mb-2">Owner Name & Address</label>
+                          <div className="p-2 bg-muted rounded whitespace-pre-line">{selectedEntry.ownerData.ownerNameAndAddress}</div>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-2">Contact No</label>
+                          <div className="p-2 bg-muted rounded">{selectedEntry.ownerData.contactNo}</div>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium mb-2">Driver Name & Mobile</label>
+                          <div className="p-2 bg-muted rounded">{selectedEntry.ownerData.driverNameAndMob}</div>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-2">Broker Name</label>
+                          <div className="p-2 bg-muted rounded">{selectedEntry.ownerData.brokerName}</div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <div className="flex justify-end gap-2">
+                    <Button variant="outline" onClick={handleDialogClose}>
+                      Close
+                    </Button>
+                    <Button onClick={() => {
+                      handleDialogClose()
+                      handleEdit(selectedEntry)
+                    }}>
+                      <Edit className="h-4 w-4 mr-2" />
+                      Edit Entry
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </DialogContent>
+          </Dialog>
         </div>
 
         {/* Alerts */}
@@ -1391,5 +1575,13 @@ export default function TransportEntriesPage() {
         </Card>
       </div>
     </Layout>
+  )
+}
+
+export default function TransportEntriesPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <TransportEntriesPageContent />
+    </Suspense>
   )
 }

@@ -166,7 +166,6 @@ export default function ReportsPage() {
   // UI states
   const [showFilters, setShowFilters] = useState(false)
   const [selectedEntries, setSelectedEntries] = useState<string[]>([])
-  const [viewMode, setViewMode] = useState<'table' | 'cards'>('table')
   const [deletingId, setDeletingId] = useState<string | null>(null)
 
   // Router for navigation
@@ -589,7 +588,7 @@ export default function ReportsPage() {
                 </div>
 
                 {/* Filter Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {/* Financial Year */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Financial Year</label>
@@ -637,20 +636,6 @@ export default function ReportsPage() {
                             {option.label}
                           </SelectItem>
                         ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* View Mode */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">View Mode</label>
-                    <Select value={viewMode} onValueChange={(value: 'table' | 'cards') => setViewMode(value)}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="table">Table View</SelectItem>
-                        <SelectItem value="cards">Card View</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
