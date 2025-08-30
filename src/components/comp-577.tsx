@@ -9,14 +9,7 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import {
   Menu,
   X,
-  User,
-  Home,
-  Settings,
-  ChevronRight,
-  FileText,
-  BarChart3,
-  Truck,
-  MapPin
+  User
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -61,15 +54,7 @@ export default function MobileOptimizedHeader() {
     setIsMobileMenuOpen(false)
   }
 
-  // Navigation items
-  const navigationItems = [
-    { href: "/", label: "Home", icon: Home },
-    { href: "/dashboard", label: "Dashboard", icon: Settings },
-    { href: "/entry", label: "Entry", icon: FileText },
-    { href: "/reports", label: "Reports", icon: BarChart3 },
-    { href: "/fleet", label: "Fleet", icon: Truck },
-    { href: "/tracking", label: "Tracking", icon: MapPin },
-  ]
+
 
   return (
     <>
@@ -89,27 +74,7 @@ export default function MobileOptimizedHeader() {
               </Link>
             </div>
 
-            {/* Center - Desktop Navigation */}
-            <nav className="hidden xl:flex items-center gap-1">
-              {navigationItems.slice(1, 5).map((item) => {
-                const Icon = item.icon
-                const isActive = pathname === item.href
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={cn(
-                      "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors",
-                      "hover:bg-accent hover:text-accent-foreground",
-                      isActive && "bg-accent text-accent-foreground"
-                    )}
-                  >
-                    <Icon className="h-4 w-4" />
-                    {item.label}
-                  </Link>
-                )
-              })}
-            </nav>
+
 
             {/* Right side - Actions */}
             <div className="flex items-center gap-2">
@@ -185,64 +150,40 @@ export default function MobileOptimizedHeader() {
               "transform transition-transform duration-300 ease-out",
               "flex flex-col translate-y-0"
             )}>
-              {/* Mobile Navigation */}
-              <nav className="flex-1 overflow-y-auto px-4 py-6" aria-label="Primary navigation">
-                <div className="space-y-2">
-                  {/* Main Navigation Items */}
-                  <div className="space-y-1">
-                    {navigationItems.map((item) => {
-                      const Icon = item.icon
-                      const isActive = pathname === item.href
-                      return (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          onClick={closeMobileMenu}
-                          className={cn(
-                            "flex items-center justify-between p-4 rounded-lg transition-colors touch-manipulation",
-                            "hover:bg-accent/50 active:bg-accent",
-                            isActive && "bg-accent/70 text-accent-foreground"
-                          )}
-                        >
-                          <div className="flex items-center gap-3">
-                            <Icon className={cn(
-                              "h-5 w-5",
-                              isActive ? "text-primary" : "text-muted-foreground"
-                            )} />
-                            <span className="font-medium">{item.label}</span>
-                          </div>
-                          <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                        </Link>
-                      )
-                    })}
+              {/* Mobile Menu Content - Simplified */}
+              <div className="flex-1 flex items-center justify-center px-4 py-6">
+                <div className="text-center space-y-4 max-w-sm">
+                  <div className="space-y-2">
+                    <h2 className="text-xl font-semibold text-foreground">Welcome to Transport Manager</h2>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      Sign in to access your dashboard or get started with a new account to manage your transport operations.
+                    </p>
                   </div>
-
-
                 </div>
-              </nav>
+              </div>
 
               {/* Mobile Menu Footer */}
               <div className="px-4 py-4 border-t bg-muted/30 safe-area-inset-bottom">
                 <div className="space-y-3">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 gap-3">
                     <Button
                       asChild
-                      variant="outline"
                       size="lg"
-                      className="w-full min-h-[52px] touch-manipulation active:scale-95 transition-transform"
+                      className="w-full min-h-[56px] touch-manipulation active:scale-95 transition-transform"
                     >
-                      <Link href="/login" onClick={closeMobileMenu}>
-                        <User className="h-4 w-4 mr-2" />
-                        Sign In
+                      <Link href="/signup" onClick={closeMobileMenu}>
+                        Get Started
                       </Link>
                     </Button>
                     <Button
                       asChild
+                      variant="outline"
                       size="lg"
-                      className="w-full min-h-[52px] touch-manipulation active:scale-95 transition-transform"
+                      className="w-full min-h-[56px] touch-manipulation active:scale-95 transition-transform"
                     >
-                      <Link href="/signup" onClick={closeMobileMenu}>
-                        Get Started
+                      <Link href="/login" onClick={closeMobileMenu}>
+                        <User className="h-4 w-4 mr-2" />
+                        Sign In
                       </Link>
                     </Button>
                   </div>
