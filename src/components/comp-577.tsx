@@ -140,18 +140,18 @@ export default function MobileOptimizedHeader() {
           <>
             {/* Mobile Menu Overlay - Full Page Blur */}
             <div
-              className="fixed inset-0 bg-black/70 backdrop-blur-lg z-40 transition-all duration-300"
+              className="fixed inset-0 bg-black/85 backdrop-blur-2xl z-40 transition-all duration-300"
               onClick={closeMobileMenu}
             />
 
             {/* Mobile Menu Content */}
             <div className={cn(
-              "fixed top-14 sm:top-16 left-0 right-0 bottom-0 bg-background/95 backdrop-blur-xl border-t z-50",
+              "fixed top-14 sm:top-16 left-0 right-0 bottom-0 bg-background/98 backdrop-blur-2xl border-t z-50",
               "transform transition-transform duration-300 ease-out",
               "flex flex-col translate-y-0"
             )}>
               {/* Mobile Menu Header with Close Button */}
-              <div className="flex items-center justify-between px-4 py-3 border-b bg-background/50">
+              <div className="flex items-center justify-between px-4 py-3 border-b bg-background/90 backdrop-blur-sm">
                 <h3 className="text-lg font-semibold text-foreground">Menu</h3>
                 <Button
                   variant="ghost"
@@ -177,7 +177,7 @@ export default function MobileOptimizedHeader() {
               </div>
 
               {/* Mobile Menu Footer */}
-              <div className="px-4 py-4 border-t bg-background/80 backdrop-blur-sm safe-area-inset-bottom">
+              <div className="px-4 py-4 border-t bg-background/95 backdrop-blur-md safe-area-inset-bottom">
                 <div className="space-y-3">
                   <div className="grid grid-cols-1 gap-3">
                     <Button
