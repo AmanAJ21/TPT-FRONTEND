@@ -138,18 +138,32 @@ export default function MobileOptimizedHeader() {
         {/* Mobile Menu - Only render when open */}
         {isMobileMenuOpen && (
           <>
-            {/* Mobile Menu Overlay */}
+            {/* Mobile Menu Overlay - Full Page Blur */}
             <div
-              className="fixed inset-0 bg-black/60 backdrop-blur-md z-40 transition-opacity duration-300"
+              className="fixed inset-0 bg-black/70 backdrop-blur-lg z-40 transition-all duration-300"
               onClick={closeMobileMenu}
             />
 
             {/* Mobile Menu Content */}
             <div className={cn(
-              "fixed top-14 sm:top-16 left-0 right-0 bottom-0 bg-background border-t z-50",
+              "fixed top-14 sm:top-16 left-0 right-0 bottom-0 bg-background/95 backdrop-blur-xl border-t z-50",
               "transform transition-transform duration-300 ease-out",
               "flex flex-col translate-y-0"
             )}>
+              {/* Mobile Menu Header with Close Button */}
+              <div className="flex items-center justify-between px-4 py-3 border-b bg-background/50">
+                <h3 className="text-lg font-semibold text-foreground">Menu</h3>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={closeMobileMenu}
+                  className="h-9 w-9 p-0 touch-manipulation hover:bg-accent/50 active:scale-95 transition-all"
+                  aria-label="Close menu"
+                >
+                  <X className="h-5 w-5" />
+                </Button>
+              </div>
+
               {/* Mobile Menu Content - Simplified */}
               <div className="flex-1 flex items-center justify-center px-4 py-6">
                 <div className="text-center space-y-4 max-w-sm">
@@ -163,7 +177,7 @@ export default function MobileOptimizedHeader() {
               </div>
 
               {/* Mobile Menu Footer */}
-              <div className="px-4 py-4 border-t bg-muted/30 safe-area-inset-bottom">
+              <div className="px-4 py-4 border-t bg-background/80 backdrop-blur-sm safe-area-inset-bottom">
                 <div className="space-y-3">
                   <div className="grid grid-cols-1 gap-3">
                     <Button
