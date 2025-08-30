@@ -6,7 +6,18 @@ import { usePathname } from "next/navigation"
 import LogoIcon from "@/app/favicon.ico"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme-toggle"
-import { Menu, X, User, Home, Settings, ChevronRight } from "lucide-react"
+import {
+  Menu,
+  X,
+  User,
+  Home,
+  Settings,
+  ChevronRight,
+  FileText,
+  BarChart3,
+  Truck,
+  MapPin
+} from "lucide-react"
 import { cn } from "@/lib/utils"
 
 export default function MobileOptimizedHeader() {
@@ -50,6 +61,16 @@ export default function MobileOptimizedHeader() {
     setIsMobileMenuOpen(false)
   }
 
+  // Navigation items
+  const navigationItems = [
+    { href: "/", label: "Home", icon: Home },
+    { href: "/dashboard", label: "Dashboard", icon: Settings },
+    { href: "/entry", label: "Entry", icon: FileText },
+    { href: "/reports", label: "Reports", icon: BarChart3 },
+    { href: "/fleet", label: "Fleet", icon: Truck },
+    { href: "/tracking", label: "Tracking", icon: MapPin },
+  ]
+
   return (
     <>
       {/* Desktop Header - Enhanced */}
@@ -63,10 +84,32 @@ export default function MobileOptimizedHeader() {
                   <img src={LogoIcon.src} alt="Logo" className="h-8 w-8 rounded-md" />
                 </div>
                 <span className="text-xl font-semibold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
-                  Transport
+                  Transport Manager
                 </span>
               </Link>
             </div>
+
+            {/* Center - Desktop Navigation */}
+            <nav className="hidden xl:flex items-center gap-1">
+              {navigationItems.slice(1, 5).map((item) => {
+                const Icon = item.icon
+                const isActive = pathname === item.href
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={cn(
+                      "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                      "hover:bg-accent hover:text-accent-foreground",
+                      isActive && "bg-accent text-accent-foreground"
+                    )}
+                  >
+                    <Icon className="h-4 w-4" />
+                    {item.label}
+                  </Link>
+                )
+              })}
+            </nav>
 
             {/* Right side - Actions */}
             <div className="flex items-center gap-2">
@@ -85,7 +128,7 @@ export default function MobileOptimizedHeader() {
       {/* Mobile Header - Optimized */}
       <header className={cn(
         "border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40 lg:hidden transition-all duration-200",
-        isScrolled && "shadow-md border-border/50"
+        isScrolled && "shadow-lg border-border/40"
       )}>
         <div className="px-4 sm:px-6">
           <div className="flex h-14 sm:h-16 items-center justify-between">
@@ -104,15 +147,17 @@ export default function MobileOptimizedHeader() {
             </div>
 
             {/* Right side - Actions */}
-            <div className="flex items-center gap-1 sm:gap-2">
-              <div className="hidden sm:block">
-                <ThemeToggle />
-              </div>
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={toggleMobileMenu}
-                className="h-11 w-11 p-0 touch-manipulation relative hover:bg-accent/50 active:scale-95 transition-all"
+                className={cn(
+                  "h-10 w-10 p-0 touch-manipulation relative transition-all duration-200",
+                  "hover:bg-accent/50 active:scale-95",
+                  isMobileMenuOpen && "bg-accent"
+                )}
                 aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
               >
                 {isMobileMenuOpen ? (
@@ -130,7 +175,7 @@ export default function MobileOptimizedHeader() {
           <>
             {/* Mobile Menu Overlay */}
             <div
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 transition-opacity duration-300 opacity-100"
+              className="fixed inset-0 bg-black/60 backdrop-blur-md z-40 transition-opacity duration-300"
               onClick={closeMobileMenu}
             />
 
@@ -138,47 +183,41 @@ export default function MobileOptimizedHeader() {
             <div className={cn(
               "fixed top-14 sm:top-16 left-0 right-0 bottom-0 bg-background border-t z-50",
               "transform transition-transform duration-300 ease-out",
-              "flex flex-col safe-area-inset-bottom translate-y-0"
+              "flex flex-col translate-y-0"
             )}>
               {/* Mobile Navigation */}
               <nav className="flex-1 overflow-y-auto px-4 py-6" aria-label="Primary navigation">
                 <div className="space-y-2">
                   {/* Main Navigation Items */}
                   <div className="space-y-1">
-                    <Link
-                      href="/"
-                      onClick={closeMobileMenu}
-                      className="flex items-center justify-between p-4 rounded-lg hover:bg-accent/50 active:bg-accent transition-colors touch-manipulation"
-                    >
-                      <div className="flex items-center gap-3">
-                        <Home className="h-5 w-5 text-muted-foreground" />
-                        <span className="font-medium">Home</span>
-                      </div>
-                      <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                    </Link>
-
-                    <Link
-                      href="/dashboard"
-                      onClick={closeMobileMenu}
-                      className="flex items-center justify-between p-4 rounded-lg hover:bg-accent/50 active:bg-accent transition-colors touch-manipulation"
-                    >
-                      <div className="flex items-center gap-3">
-                        <Settings className="h-5 w-5 text-muted-foreground" />
-                        <span className="font-medium">Dashboard</span>
-                      </div>
-                      <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                    </Link>
+                    {navigationItems.map((item) => {
+                      const Icon = item.icon
+                      const isActive = pathname === item.href
+                      return (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          onClick={closeMobileMenu}
+                          className={cn(
+                            "flex items-center justify-between p-4 rounded-lg transition-colors touch-manipulation",
+                            "hover:bg-accent/50 active:bg-accent",
+                            isActive && "bg-accent/70 text-accent-foreground"
+                          )}
+                        >
+                          <div className="flex items-center gap-3">
+                            <Icon className={cn(
+                              "h-5 w-5",
+                              isActive ? "text-primary" : "text-muted-foreground"
+                            )} />
+                            <span className="font-medium">{item.label}</span>
+                          </div>
+                          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                        </Link>
+                      )
+                    })}
                   </div>
 
-                  {/* Theme Toggle for Mobile */}
-                  <div className="pt-4 border-t sm:hidden">
-                    <div className="flex items-center justify-between p-4 rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <span className="font-medium">Theme</span>
-                      </div>
-                      <ThemeToggle />
-                    </div>
-                  </div>
+
                 </div>
               </nav>
 
@@ -208,18 +247,13 @@ export default function MobileOptimizedHeader() {
                     </Button>
                   </div>
 
-                  {/* Quick Info */}
-                  <div className="text-center pt-2">
-                    <p className="text-xs text-muted-foreground">
-                      Transport Manager v1.0
-                    </p>
-                  </div>
                 </div>
               </div>
             </div>
+
           </>
         )}
-      </header>
+      </header >
     </>
   )
 }
